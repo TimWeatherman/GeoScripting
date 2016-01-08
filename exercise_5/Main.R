@@ -8,6 +8,7 @@ library(rgdal)
 library(raster)
 source("functions/ndvover.R")
 source("functions/cloud2NA.R")
+source("functions/removeNDVIextremes.R")
 
 #check working directory
 getwd()
@@ -50,9 +51,20 @@ NDVI2014 = calculateNDVI(brick2014, 8)
 NDVI1990 = cloud2NA(NDVI1990, brick1990[[1]])
 NDVI2014 = cloud2NA(NDVI2014, brick2014[[1]])
 
-#Give both 
+NDVI1990 = removeNDVIextremes(NDVI1990)
+NDVI2014 = removeNDVIextremes(NDVI2014)
+
+#Give both input files teh same extent
+
+crop1990 = crop(NDVI1990, NDVI2014)
+crop2014 = crop(NDVI2014, NDVI1990)
 
 
+cropstack = stack(list(crop1990, crop2014))
+result = (cropstack[[2]] - cropstack[[1]])
+
+
+plot(result)
 #good job!
 
 
