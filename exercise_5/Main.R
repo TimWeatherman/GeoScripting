@@ -15,63 +15,69 @@ source("functions/detectLandsat.R")
 #check working directory
 getwd()
 
-#function(linkformer, linklatter)
+plotNDVIdifference = function(linkformer, linklatter)
+{
+		
+	#download the files
+	#1990-04-08 (acquisition_date)
+	download.file(url = linkformer, destfile = 'files/former.tar.gz', method = 'wget')
+	#2014-04-19 (acquisition_date)
+	download.file(url = linklatter, destfile = 'files/latter.tar.gz', method = 'wget')
 	
-#download the files
-#2014-04-19 (acquisition_date)
-download.file(url = 'https://www.dropbox.com/s/i1ylsft80ox6a32/LC81970242014109-SC20141230042441.tar.gz', destfile = 'files/2014.tar.gz', method = 'wget')
-#1990-04-08 (acquisition_date)
-download.file(url = 'https://www.dropbox.com/s/akb9oyye3ee92h3/LT51980241990098-SC20150107121947.tar.gz', destfile = 'files/1990.tar.gz', method = 'wget')
+	
+	#untar the files
+	untar("files/former.tar.gz", exdir = "files")
+	untar("files/latter.tar.gz", exdir = "files")
+	
+	#put all the bands in a list
+	listformer = list.files('files', pattern = glob2rx('LT*.tif'), full.names = TRUE)
+	listlatter = list.files('files', pattern = glob2rx('LC*.tif'), full.names = TRUE)
+	
+	#Combine all rasters in a rasterbrick
+	rasterformer = lapply(listformer, raster)
+	rasterlatter = lapply(listlatter, raster)
+	
+	brickformer = brick(rasterformer)
+	bricklatter = brick(rasterlatter)
+	
+	brickformer = getCFmaskRedNIR(brickformer)
+	bricklatter = getCFmaskRedNIR(bricklatter)
+	
+	#substract the 2 NDVI images.
+	#landsat 5
+	#landsat 8
+	
+	NDVIformer = calculateNDVI(brickformer)
+	NDVIlatter = calculateNDVI(bricklatter)
+	
+	#remove the clouds from the images 
+	#band 1 (2 & 4) for landsat 5
+	#band 1 (2 & 4) for landsat 8
+	#overwritten NDVIformer and NDVIlatter to save memory space
+	
+	NDVIformer = cloud2NA(NDVIformer, brickformer[[1]])
+	NDVIlatter = cloud2NA(NDVIlatter, bricklatter[[1]])
+	
+	#removed the extremes to get a clear image. A couple of pixels with unlikely high/low values.
+	NDVIformer = removeNDVIextremes(NDVIformer)
+	NDVIlatter = removeNDVIextremes(NDVIlatter)
+	
+	#Give both input files the same extent
+	
+	cropformer = crop(NDVIformer, NDVIlatter)
+	croplatter = crop(NDVIlatter, NDVIformer)
+	
+	cropstack = stack(list(cropformer, croplatter))
+	result = (cropstack[[2]] - cropstack[[1]])
+	
+	#plot result
+	plot(result)
+	print("The positive NDVI values show a growth in vegetation and the negative NDVI numbers show a decrease in vegetation")
+	
+	#done
+	print("Good job!")
 
-#untar the files
-untar("files/1990.tar.gz", exdir = "files")
-untar("files/2014.tar.gz", exdir = "files")
+}
 
-#put all the bands in a list
-list1990 = list.files('files', pattern = glob2rx('LT*.tif'), full.names = TRUE)
-list2014 = list.files('files', pattern = glob2rx('LC*.tif'), full.names = TRUE)
-
-#Combine all rasters in a rasterbrick
-raster1990 = lapply(list1990, raster)
-raster2014 = lapply(list2014, raster)
-
-brick1990 = brick(raster1990)
-brick2014 = brick(raster2014)
-
-brick1990 = getCFmaskRedNIR(brick1990)
-brick2014 = getCFmaskRedNIR(brick2014)
-
-#substract the 2 NDVI images.
-#landsat 5
-#landsat 8
-
-NDVI1990 = calculateNDVI(brick1990)
-NDVI2014 = calculateNDVI(brick2014)
-
-#remove the clouds from the images 
-#band 1 (2 & 4) for landsat 5
-#band 1 (2 & 4) for landsat 8
-#overwritten NDVI1990 and NDVI2014 to save memory space
-
-NDVI1990 = cloud2NA(NDVI1990, brick1990[[1]])
-NDVI2014 = cloud2NA(NDVI2014, brick2014[[1]])
-
-#removed the extremes to get a clear image. A couple of pixels with unlikely high/low values.
-NDVI1990 = removeNDVIextremes(NDVI1990)
-NDVI2014 = removeNDVIextremes(NDVI2014)
-
-#Give both input files the same extent
-
-crop1990 = crop(NDVI1990, NDVI2014)
-crop2014 = crop(NDVI2014, NDVI1990)
-
-cropstack = stack(list(crop1990, crop2014))
-result = (cropstack[[2]] - cropstack[[1]])
-
-#plot result
-plot(result)
-print("The positive NDVI values show a growth in vegetation and the negative NDVI numbers show a decrease in vegetation")
-
-#done
-print("Good job!")
-
+plotNDVIdifference('https://www.dropbox.com/s/akb9oyye3ee92h3/LT51980241990098-SC20150107121947.tar.gz', 
+									 'https://www.dropbox.com/s/i1ylsft80ox6a32/LC81970242014109-SC20141230042441.tar.gz')
