@@ -10,10 +10,13 @@ library(raster)
 source("functions/ndvover.R")
 source("functions/cloud2NA.R")
 source("functions/removeNDVIextremes.R")
+source("functions/detectLandsat.R")
 
 #check working directory
 getwd()
 
+#function(linkformer, linklatter)
+	
 #download the files
 #2014-04-19 (acquisition_date)
 download.file(url = 'https://www.dropbox.com/s/i1ylsft80ox6a32/LC81970242014109-SC20141230042441.tar.gz', destfile = 'files/2014.tar.gz', method = 'wget')
@@ -35,12 +38,15 @@ raster2014 = lapply(list2014, raster)
 brick1990 = brick(raster1990)
 brick2014 = brick(raster2014)
 
+brick1990 = getCFmaskRedNIR(brick1990)
+brick2014 = getCFmaskRedNIR(brick2014)
+
 #substract the 2 NDVI images.
 #landsat 5
 #landsat 8
 
-NDVI1990 = calculateNDVI(brick1990, 5)
-NDVI2014 = calculateNDVI(brick2014, 8)
+NDVI1990 = calculateNDVI(brick1990)
+NDVI2014 = calculateNDVI(brick2014)
 
 #remove the clouds from the images 
 #band 1 (2 & 4) for landsat 5
