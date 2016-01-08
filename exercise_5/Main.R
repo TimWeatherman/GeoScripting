@@ -76,7 +76,7 @@ plotNDVIdifference = function(linkformer, linklatter)
 	
 	#done
 	print("Good job!")
-
+	return(result)
 }
 
 plotNDVIdifference('https://www.dropbox.com/s/akb9oyye3ee92h3/LT51980241990098-SC20150107121947.tar.gz', 
