@@ -7,6 +7,7 @@
 library(rgdal)
 library(raster)
 source("functions/ndvover.R")
+source("functions/cloud2NA.R")
 
 #check working directory
 getwd()
@@ -21,7 +22,9 @@ download.file(url = 'https://www.dropbox.com/s/akb9oyye3ee92h3/LT51980241990098-
 untar("files/1990.tar.gz", exdir = "files")
 untar("files/2014.tar.gz", exdir = "files")
 
-#put all the bands in a list
+#put all the # Team Rython - Dainius Masiliunas - Tim Weerman
+# 8 January 2016
+# Apache license 2.0bands in a list
 list1990 = list.files('files', pattern = glob2rx('LT*.tif'), full.names = TRUE)
 list2014 = list.files('files', pattern = glob2rx('LC*.tif'), full.names = TRUE)
 
@@ -36,8 +39,8 @@ brick2014 = brick(raster2014)
 #landsat 5, bands 6 & 7. 6 is red and 7 is NIR.
 #landsat 8, bands 
 
-NDVI1990 = calculateNDVI5(brick1990)
-
+NDVI1990 = calculateNDVI(brick1990, 5)
+NDVI2014 = calculateNDVI(brick2014, 8)
 
 #remove the clouds from the images 
 #band 1 (2 & 4) for landsat 5

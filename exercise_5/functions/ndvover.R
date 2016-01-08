@@ -7,9 +7,9 @@ ndvOver <- function(x, y) {
 	return(ndvi)
 }
 
-calculateNDVI5 = function(x, LandsatNum){
+calculateNDVI = function(x, LandsatNum){
 	if (LandsatNum == 5)
-	return(overlay(x= x[[6]], y=x[[7]], fun=ndvOver))#redo the numbers
+	return(overlay(x= x[[6]], y=x[[7]], fun=ndvOver))#band 3 red and band 4 NIR
 	else if (LandsatNum == 8) 
-	return(overlay(x= x[[4]], y=x[[5]], fun=ndvOver))#redo the numbers
+	return(overlay(x= x[[5]], y=x[[6]], fun=ndvOver))#band 4 red and band 5 NIR
 }
