@@ -45,9 +45,12 @@ NDVI2014 = calculateNDVI(brick2014, 8)
 #remove the clouds from the images 
 #band 1 (2 & 4) for landsat 5
 #band 1 (2 & 4) for landsat 8
+#overwritten NDVI1990 and NDVI2014 to save memory space
 
+NDVI1990 = cloud2NA(NDVI1990, brick1990[[1]])
+NDVI2014 = cloud2NA(NDVI2014, brick2014[[1]])
 
-
+#Give both 
 
 
 #good job!

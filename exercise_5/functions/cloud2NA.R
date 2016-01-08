@@ -2,7 +2,8 @@
 # 8 January 2016
 # Apache license 2.0
 
-cloud2NA <- function(x, y){
-	x[y != 0] <- NA
-	return(x)
+cloud2NA <- function(input, CFmask){
+	input[CFmask == 2]  <- NA
+	input[CFmask == 4]  <- NA
+	return(input)
 }
